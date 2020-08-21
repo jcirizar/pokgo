@@ -1,0 +1,16 @@
+{
+  "name": "pokgo",
+  "version": "0.0.1",
+  "keywords": ["pokemon", "pokemon go", "pokemon go damage", "pokemon go chart"],
+  "description": "Pokemon Go Cli to see type weakness and resistance",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Juan C Irizar",
+  "license": "MIT",
+  "homepage": "https://github.com/jcirizar/pokgo#readme",
+  "bin": {
+    "pokgo": "./index.js"
+  }
+}
