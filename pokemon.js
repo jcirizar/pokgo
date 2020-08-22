@@ -147,6 +147,7 @@ function getChartOfType(type1) {
 
 module.exports = {
   getChartOfType,
+  typesArray: types,
   types: {
     normal,
     fighting,

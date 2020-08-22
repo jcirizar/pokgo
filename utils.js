@@ -37,10 +37,52 @@ const addStringsHorizontally = (args, options = {
       return line ? line.padEnd(longestLineLength, ' ') : ' '.repeat(longestLineLength);
     })
   })
-  return modified.map((arrays) => arrays.join('')).join('\n')+ '\n';
+  return modified.map((arrays) => arrays.join('')).join('\n') + '\n';
+}
+
+function mergeDeep(target, source) {
+  const isObject = (obj) => obj && typeof obj === 'object';
+
+  if (!isObject(target) || !isObject(source)) {
+    return source;
+  }
+
+  Object.keys(source).forEach(key => {
+    const targetValue = target[key];
+    const sourceValue = source[key];
+
+    if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
+      target[key] = targetValue.concat(sourceValue);
+    } else if (isObject(targetValue) && isObject(sourceValue)) {
+      target[key] = mergeDeep(Object.assign({}, targetValue), sourceValue);
+    } else {
+      target[key] = sourceValue;
+    }
+  });
+
+  return target;
+}
+
+function round(value, decimals) {
+  return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+}
+
+function removeConsecutiveRepeatedString(array) {
+  return array.filter((item, pos, arr) => {
+    return pos === 0 || item !== arr[pos - 1];
+  })
+}
+
+
+function removeEmptyLines(str) {
+  return str.split('\n').filter((v) => v.trim() !== '').join('\n');
 }
 
 module.exports = {
+  addStringsHorizontally,
   boxString,
-  addStringsHorizontally
+  mergeDeep,
+  removeEmptyLines,
+  removeConsecutiveRepeatedString,
+  round
 }

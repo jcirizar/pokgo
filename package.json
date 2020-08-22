@@ -1,6 +1,6 @@
 {
   "name": "pokgo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": ["pokemon", "pokemon go", "pokemon go damage", "pokemon go chart"],
   "description": "Pokemon Go Cli to see type weakness and resistance",
   "main": "index.js",

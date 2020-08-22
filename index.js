@@ -1,47 +1,34 @@
 #!/usr/bin/env node
+const {removeEmptyLines} = require("./utils");
+const {round} = require("./utils");
+const {mergeDeep} = require("./utils");
 let [_, __, ...pokemonTypes] = process.argv;
 
-const {getChartOfType, types} = require("./pokemon");
+
+const {getChartOfType, types, typesArray} = require("./pokemon");
 const {boxString, addStringsHorizontally} = require('./utils');
 
-function mergeDeep(target, source) {
-  const isObject = (obj) => obj && typeof obj === 'object';
+let typesLowerCase = pokemonTypes.map((type) => type.toLowerCase());
 
-  if (!isObject(target) || !isObject(source)) {
-    return source;
-  }
-
-  Object.keys(source).forEach(key => {
-    const targetValue = target[key];
-    const sourceValue = source[key];
-
-    if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
-      target[key] = targetValue.concat(sourceValue);
-    } else if (isObject(targetValue) && isObject(sourceValue)) {
-      target[key] = mergeDeep(Object.assign({}, targetValue), sourceValue);
-    } else {
-      target[key] = sourceValue;
-    }
-  });
-
-  return target;
+if (!typesLowerCase.every((typeIn) => typesArray.includes(typeIn))) {
+  console.error('Invalid Pokemon Type(s)');
+  console.log('Please enter one or multiple of the next')
+  console.log(typesArray);
+  console.log(
+    addStringsHorizontally(
+      ['Example:', boxString('pokgo dragon dark')],
+      {
+        align: 'center'
+      }
+    )
+  );
+  return process.exit(1);
 }
 
-let charts = pokemonTypes.map((t) => getChartOfType(types[t]))
-
-
-function customizer(objValue, srcValue) {
-  if (_.isArray(objValue)) {
-    return objValue.concat(srcValue);
-  }
-}
-
-function round(value, decimals) {
-  return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
-}
-
+let charts = typesLowerCase.map((t) => getChartOfType(types[t]))
 
 const merged = charts.reduce((acc, cur) => mergeDeep(acc, cur), {})
+
 const percentages = Object.entries(merged).map((entry) => {
   const values = {
     '0': 0.39,
@@ -56,12 +43,13 @@ const percentages = Object.entries(merged).map((entry) => {
       return acc * cur
     }, 1) * 100)
   }
-
 }).sort((a, b) => Object.entries(b)[0][1] - Object.entries(a)[0][1]);
+
 const weaknesses = {};
 const resistances = {};
 
 let finalObject = Object.assign({}, ...percentages);
+
 for (let type in Object.assign({}, ...percentages)) {
   let val = finalObject[type];
   if (val > 100) {
@@ -72,33 +60,18 @@ for (let type in Object.assign({}, ...percentages)) {
   }
 }
 
-function removeConsecutiveRepitedString(array) {
-  return array.filter((item, pos, arr) => {
-    return pos === 0 || item !== arr[pos - 1];
-  })
-}
-
-function removeEmptyLines(str) {
-  return str.split('\n').filter((v) => v.trim() !== '').join('\n');
-}
-
-//==============================================================================================================
-
 
 let weakBoxes = [];
 for (let type in weaknesses) {
   weakBoxes.push(boxString(`${type.toUpperCase()}: ${weaknesses[type]}`, 'bold'));
 }
 
-
 let resistanceBoxes = [];
 for (let type in resistances) {
   resistanceBoxes.push(boxString(`${type.toUpperCase()}: ${resistances[type]}`, 'rounded'));
 }
 
-const pokemonTypesString = removeEmptyLines(pokemonTypes.map((t) => boxString(t)).reduce((acc, cur) => acc + cur, ''));
-// const weakNoLines = removeEmptyLines(weakBoxes);
-// const resistanceNoLines = removeEmptyLines(resistanceBoxes);
+const pokemonTypesString = removeEmptyLines(typesLowerCase.map((t) => boxString(t.toUpperCase())).reduce((acc, cur) => acc + cur, ''));
 
 let weakStrings = [];
 let resistanceStrings = [];
@@ -134,7 +107,6 @@ function accumulate(arrays) {
 
 let weakness = accumulate(weakStrings);
 let resistance = accumulate(resistanceStrings);
-
 
 console.log(
   addStringsHorizontally(
